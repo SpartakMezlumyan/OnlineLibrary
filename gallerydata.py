@@ -87,20 +87,27 @@ class GalleryData:
 
     def list_control_dirs(self, dir):
         file_path = os.path.join(str(Path(__file__).parent), "examples", dir)
-        control_dirs = [
-            f
-            for f in os.listdir(file_path)
-            if not isfile(f)
-            and f not in ["index.py", "images", "__pycache__", ".venv", ".git"]
-        ]
-        return control_dirs
+        try:
+            control_dirs = [
+                f
+                for f in os.listdir(file_path)
+                if os.path.isdir(os.path.join(file_path, f)) and f not in ["index.py", "images", "__pycache__", ".venv", ".git"]
+            ]
+            return control_dirs
+        except FileNotFoundError:
+            print(f"Directory '{file_path}' not found.")
+            return []
 
     def list_example_files(self, control_group_dir, control_dir):
         file_path = os.path.join(
             str(Path(__file__).parent), "examples", control_group_dir, control_dir
         )
-        example_files = [f for f in os.listdir(file_path) if not f.startswith("_")]
-        return example_files
+        try:
+            example_files = [f for f in os.listdir(file_path) if not f.startswith("_")]
+            return example_files
+        except FileNotFoundError:
+            print(f"Directory '{file_path}' not found.")
+            return []
 
     def import_modules(self):
         for control_group_dir in self.control_groups:
@@ -120,28 +127,35 @@ class GalleryData:
                             str(Path(__file__).parent), "examples", file_name
                         )
 
-                        spec = importlib.util.spec_from_file_location(
-                            module_name, file_path
-                        )
-                        module = importlib.util.module_from_spec(spec)
-                        sys.modules[module_name] = module
-                        spec.loader.exec_module(module)
-                        print(f"{module_name!r} has been imported")
-                        if file == "index.py":
-                            grid_item.name = module.name
-                            grid_item.description = module.description
-                        else:
-                            example_item = ExampleItem()
-                            example_item.example = module.example
-
-                            example_item.file_name = (
-                                module_name.replace(".", "/") + ".py"
+                        try:
+                            spec = importlib.util.spec_from_file_location(
+                                module_name, file_path
                             )
-                            example_item.name = module.name
-                            example_item.order = file[
-                                :2
-                            ]  # first 2 characters of example file name (e.g. '01')
-                            grid_item.examples.append(example_item)
+                            module = importlib.util.module_from_spec(spec)
+                            sys.modules[module_name] = module
+                            spec.loader.exec_module(module)
+                            print(f"{module_name!r} has been imported")
+                            if file == "index.py":
+                                grid_item.name = module.name
+                                grid_item.description = module.description
+                            else:
+                                example_item = ExampleItem()
+                                example_item.example = module.example
+
+                                example_item.file_name = (
+                                    module_name.replace(".", "/") + ".py"
+                                )
+                                example_item.name = module.name
+                                example_item.order = file[
+                                    :2
+                                ]  # first 2 characters of example file name (e.g. '01')
+                                grid_item.examples.append(example_item)
+                        except FileNotFoundError:
+                            print(f"File '{file_path}' not found.")
+                            continue
+                        except Exception as e:
+                            print(f"Error importing module '{module_name}': {e}")
+                            continue
                 grid_item.examples.sort(key=lambda x: x.order)
                 control_group_dir.grid_items.append(grid_item)
             control_group_dir.grid_items.sort(key=lambda x: x.name)
