@@ -1,7 +1,17 @@
-import flet
+import flet as ft
 from flet import *
 from math import pi
 import time
+import csv
+
+def check_credentials(username, password):
+    with open('users.csv', 'r') as csv_file:
+        csv_reader = csv.reader(csv_file)
+        for row in csv_reader:
+            if row[0] == username and row[1] == password:
+                return True
+        return False
+
 
 class AnimatedBox(UserControl):
     def __init__(self, border_color, bg_color, rotate_angle):
@@ -23,8 +33,10 @@ class AnimatedBox(UserControl):
 
 
 class SignInButton(UserControl):
-    def __init__(self, btn_name):
+    def __init__(self, btn_name, username_input, password_input):
         self.btn_name = btn_name
+        self.username_input = username_input
+        self.password_input = password_input
         super().__init__()
 
     def build(self):
@@ -46,17 +58,27 @@ class SignInButton(UserControl):
                 ),
                 height=42,
                 width=320,
+                on_click=self.sign_in_handler,
             ),
         )
 
+    def sign_in_handler(self, e):
+        if check_credentials(self.username_input, self.password_input):
+            print("Вход выполнен успешно")
+        else:
+            error_message = Text("Неверное имя пользователя или пароль", size=12, color="red")
+            self.controls.append(error_message)
+            self.update()
+
+
 class UserInputField(UserControl):
     def __init__(
-        self,
-        icon_name,
-        text_hint,
-        hide: bool,
-        function_emails: bool,
-        function_check: bool,
+            self,
+            icon_name,
+            text_hint,
+            hide: bool,
+            function_emails: bool,
+            function_check: bool,
     ):
         self.icon_name = icon_name
         self.text_hint = text_hint
@@ -130,12 +152,14 @@ class UserInputField(UserControl):
         )
 
 
-def main(page: Page):
+def mainlog(page: Page):
     page.horizontal_alignment = "center"
     page.vertical_alignment = "center"
     page.padding = padding.only(right=50)
     page.bgcolor = "#212328"
 
+    username_input = ""
+    password_input = ""
 
     page.add(
         Card(
@@ -186,8 +210,7 @@ def main(page: Page):
                             True,
                         ),
                         Divider(height=1, color="transparent"),
-                        Divider(height=1, color="transparent"),
-                        SignInButton("Sign In"),
+                        SignInButton("Sign In", username_input, password_input),  # Кнопка входа
                         Divider(height=35, color="transparent"),
                     ],
                 ),
@@ -196,5 +219,4 @@ def main(page: Page):
     )
     page.update()
 
-if __name__ == "__main__":
-    flet.app(target=main)
+ft.app(target=mainlog)

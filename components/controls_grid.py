@@ -13,8 +13,7 @@ class ControlsGrid(ft.GridView):
         self.gallery = gallery
 
     def grid_item_clicked(self, e):
-        route = f"{self.page.route}/{e.control.data.id}"
-        self.page.go(route)
+        print("asdasd")
 
     def display(self):
         self.visible = True
@@ -31,7 +30,7 @@ class ControlsGrid(ft.GridView):
                         alignment=ft.MainAxisAlignment.START,
                         vertical_alignment=ft.MainAxisAlignment.CENTER,
                         controls=[
-                            ft.Icon(name=ft.icons.FOLDER_OPEN),
+                            ft.IconButton(ft.icons.ADD, tooltip="Add", icon_color=ft.colors.BLACK87),
                             ft.Text(
                                 value=grid_item.name,
                                 weight=ft.FontWeight.W_500,

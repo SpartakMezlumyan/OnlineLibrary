@@ -1,8 +1,6 @@
 import logging
-
 import flet as ft
 import flet.version
-
 from components.gallery_view import GalleryView
 from gallerydata import GalleryData
 
@@ -46,7 +44,6 @@ def main(page: ft.Page):
 
     page.theme_mode = ft.ThemeMode.DARK
     page.on_error = lambda e: print("Page error:", e.data)
-
     page.add(gallery_view)
     page.on_route_change = route_change
     print(f"Initial route: {page.route}")

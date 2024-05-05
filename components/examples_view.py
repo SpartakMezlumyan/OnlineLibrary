@@ -1,6 +1,5 @@
 import flet as ft
 
-
 class ExamplesView(ft.Column):
     def __init__(self, gallery):
         super().__init__()
@@ -26,31 +25,6 @@ class ExamplesView(ft.Column):
             self.examples.controls.append(
                 ft.Column(
                     controls=[
-                        ft.Container(
-                            content=ft.Row(
-                                alignment=ft.MainAxisAlignment.SPACE_BETWEEN,
-                                controls=[
-                                    ft.Text(
-                                        example.name,
-                                        style=ft.TextThemeStyle.TITLE_MEDIUM,
-                                        weight=ft.FontWeight.W_500,
-                                    ),
-                                    ft.IconButton(
-                                        content=ft.Image(
-                                            src="github-mark.svg",
-                                            width=24,
-                                            height=24,
-                                            color=ft.colors.ON_SURFACE,
-                                        ),
-                                        url=f"https://github.com/flet-dev/examples/blob/main/python/apps/controls-gallery/examples/{example.file_name}",
-                                        url_target="_blank",
-                                    ),
-                                ],
-                            ),
-                            bgcolor=ft.colors.SECONDARY_CONTAINER,
-                            padding=5,
-                            border_radius=5,
-                        ),
                         ft.Container(
                             content=example.example(),
                             clip_behavior=ft.ClipBehavior.NONE,
