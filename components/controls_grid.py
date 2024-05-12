@@ -1,5 +1,24 @@
 import flet as ft
+import sqlite3
+from getcode import *
 
+conn = sqlite3.connect('/home/spartak/DataGripProjects/SchoolLibraryBotDatabase/identifier.sqlite')
+cur = conn.cursor()
+
+cur.execute("SELECT * FROM books")
+rows = cur.fetchall()
+
+if rows:
+    row = rows[0]
+    title_text = f"{row[1]} {row[2]} --- {row[3]},\n {row[4]}"
+    title = ft.Text(title_text)
+else:
+    title = ft.Text("No Book Information Found")
+
+cur.close()
+conn.close()
+
+received_code = ft.Text(code)
 
 class ControlsGrid(ft.GridView):
     def __init__(self, gallery):
@@ -13,30 +32,73 @@ class ControlsGrid(ft.GridView):
         self.gallery = gallery
 
     def grid_item_clicked(self, e):
-        print("asdasd")
+        pass
 
     def display(self):
         self.visible = True
+
+        def close_banner(e):
+            self.page.banner.open = False
+            self.page.update()
+
+        def open_dlg(e):
+            self.page.dialog = dlg
+            dlg.open = True
+            self.page.update()
+
+        def receive_code(e):
+            self.page.dialog = dlgr
+            dlgr.open = True
+            self.page.update()
+
+        self.page.banner = ft.Banner(
+            bgcolor=ft.colors.BLACK,
+            leading=ft.Icon(ft.icons.WARNING_AMBER_ROUNDED, color=ft.colors.AMBER, size=40),
+            content=ft.Text(
+                "To receive a code for the book or information about it, click the submit button"
+            ),
+            actions=[
+                ft.TextButton("Book Info", on_click=open_dlg),
+                ft.TextButton("Receive a code", on_click=receive_code),
+                ft.TextButton("Cancel", on_click=close_banner),
+            ],
+        )
+
+        def show_banner_click(e):
+            self.page.banner.open = True
+            self.page.update()
+
+        # self.page.add(ft.ElevatedButton("Show Banner", on_click=show_banner_click))
+
+        dlg = ft.AlertDialog(title=title, on_dismiss=lambda e: print("Dialog dismissed!"))
+        dlgr = ft.AlertDialog(title=received_code, on_dismiss=lambda e: print("Dialog dismissed!"))
+
         self.controls = []
-        for grid_item in self.gallery.selected_control_group.grid_items:
+        for row in rows:
+            title_text = row[3]
             self.controls.append(
                 ft.Container(
                     on_click=self.grid_item_clicked,
-                    data=grid_item,
                     bgcolor=ft.colors.SECONDARY_CONTAINER,
                     border_radius=5,
-                    padding=15,
-                    content=ft.Row(
-                        alignment=ft.MainAxisAlignment.START,
-                        vertical_alignment=ft.MainAxisAlignment.CENTER,
+                    width=250,
+                    height=100,
+                    content=ft.Column(
                         controls=[
-                            ft.IconButton(ft.icons.ADD, tooltip="Add", icon_color=ft.colors.BLACK87),
-                            ft.Text(
-                                value=grid_item.name,
-                                weight=ft.FontWeight.W_500,
-                                size=14,
+                            ft.Row(
+                                alignment=ft.MainAxisAlignment.START,
+                                controls=[
+                                    ft.IconButton(ft.icons.INFO, tooltip="Information", icon_color=ft.colors.BLACK87,
+                                                  on_click=show_banner_click),
+                                    ft.Text(
+                                        value=title_text,
+                                        weight=ft.FontWeight.W_500,
+                                        size=14,
+                                    ),
+                                ],
                             ),
                         ],
                     ),
                 )
             )
+

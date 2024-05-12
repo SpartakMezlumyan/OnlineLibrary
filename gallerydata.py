@@ -56,20 +56,20 @@ class GalleryData:
                 selected_icon=ft.icons.BOOK,
                 index=1,
             ),
-            ControlGroup(
-                name="displays",
-                label="Writers",
-                icon=ft.icons.MAN,
-                selected_icon=ft.icons.MAN,
-                index=2,
-            ),
-            ControlGroup(
-                name="dialogs",
-                label="Dialogs",
-                icon=ft.icons.MESSAGE_SHARP,
-                selected_icon=ft.icons.MESSAGE_SHARP,
-                index=5,
-            ),
+            # ControlGroup(
+            #     name="displays",
+            #     label="Writers",
+            #     icon=ft.icons.MAN,
+            #     selected_icon=ft.icons.MAN,
+            #     index=2,
+            # ),
+            # ControlGroup(
+            #     name="dialogs",
+            #     label="Dialogs",
+            #     icon=ft.icons.MESSAGE_SHARP,
+            #     selected_icon=ft.icons.MESSAGE_SHARP,
+            #     index=5,
+            # ),
         ]
         self.import_modules()
         self.selected_control_group = self.control_groups[0]
@@ -148,7 +148,7 @@ class GalleryData:
                                 example_item.name = module.name
                                 example_item.order = file[
                                     :2
-                                ]  # first 2 characters of example file name (e.g. '01')
+                                ]
                                 grid_item.examples.append(example_item)
                         except FileNotFoundError:
                             print(f"File '{file_path}' not found.")
