@@ -2,7 +2,7 @@ import flet as ft
 import sqlite3
 from getcode import *
 
-conn = sqlite3.connect('/home/spartak/DataGripProjects/SchoolLibraryBotDatabase/identifier.sqlite')
+conn = sqlite3.connect('/home/spartak/OnlineLibrary/SchoolLibraryBotDatabase/identifier.sqlite')
 cur = conn.cursor()
 
 cur.execute("SELECT * FROM books")
@@ -15,7 +15,6 @@ if rows:
         title = ft.Text(title_text)
 else:
     print(False)
-
 
 
 cur.close()
