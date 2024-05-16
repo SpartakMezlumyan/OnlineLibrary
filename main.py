@@ -8,7 +8,9 @@ gallery = GalleryData()
 
 logging.basicConfig(level=logging.INFO)
 
+
 def main(page: ft.Page):
+
     page.title = "Online Library"
 
     page.fonts = {
@@ -48,5 +50,8 @@ def main(page: ft.Page):
     page.on_route_change = route_change
     print(f"Initial route: {page.route}")
     page.go(page.route)
+
+
+
 
 ft.app(main)

@@ -10,10 +10,13 @@ rows = cur.fetchall()
 
 if rows:
     row = rows[0]
-    title_text = f"{row[1]} {row[2]} --- {row[3]},\n {row[4]}"
-    title = ft.Text(title_text)
+    for row in rows:
+        title_text = f"{row[1]} {row[2]} --- {row[3]},\n {row[4]}"
+        title = ft.Text(title_text)
 else:
-    title = ft.Text("No Book Information Found")
+    print(False)
+
+
 
 cur.close()
 conn.close()
@@ -75,7 +78,7 @@ class ControlsGrid(ft.GridView):
 
         self.controls = []
         for row in rows:
-            title_text = row[3]
+            title_book = row[3]
             self.controls.append(
                 ft.Container(
                     on_click=self.grid_item_clicked,
@@ -91,7 +94,7 @@ class ControlsGrid(ft.GridView):
                                     ft.IconButton(ft.icons.INFO, tooltip="Information", icon_color=ft.colors.BLACK87,
                                                   on_click=show_banner_click),
                                     ft.Text(
-                                        value=title_text,
+                                        value=title_book,
                                         weight=ft.FontWeight.W_500,
                                         size=14,
                                     ),
