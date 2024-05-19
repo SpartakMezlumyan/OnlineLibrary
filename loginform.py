@@ -1,110 +1,265 @@
-import flet as ft
-import sqlite3
+import flet
+from flet import *
+from math import pi
+import time
 
-def mains(page: ft.Page):
-    page.title = "SchoolLibrary"
-    page.theme_mode = 'dark'
-    page.vertical_alignment = ft.MainAxisAlignment.CENTER
-    page.window_width = 400
-    page.window_height = 350
 
-    x = True
+class AnimatedBox(UserControl):
+    def __init__(self, border_color, bg_color, rotate_angle):
+        self.border_color = border_color
+        self.bg_color = bg_color
+        self.rotate_angle = rotate_angle
+        super().__init__()
 
-    def auth_user(e):
-        db_path = '/home/spartak/DataGripProjects/UsersDataBase/identifier.sqlite'
-        db = sqlite3.connect(db_path)
-        cur = db.cursor()
-        cur.execute(f"SELECT * FROM users WHERE email = '{user_login.value}' AND'{user_pass.value}'")
-        if cur.fetchone() != None:
-            user_login.value = ''
-            user_pass.value = ''
-            btn_auth.text = 'Added'
+    def build(self):
+        return Container(
+            width=48,
+            height=48,
+            border=border.all(2.5, self.border_color),
+            bgcolor=self.bg_color,
+            border_radius=2,
+            rotate=transform.Rotate(self.rotate_angle, alignment.center),
+            animate_rotation=animation.Animation(700, "easeInOut"),
+        )
 
-            if len(page.navigation_bar.destinations) == 2:
-                page.navigation_bar.destinations.append(ft.NavigationDestination(
-                    icon=ft.icons.BOOK,
-                    label='Cabinet',
-                    selected_icon=ft.icons.BOOKMARK
-                ))
-            page.update()
+
+class SignInButton(UserControl):
+    def __init__(self, btn_name):
+        self.btn_name = btn_name
+        super().__init__()
+
+    def build(self):
+        return Container(
+            content=ElevatedButton(
+                content=Text(
+                    self.btn_name,
+                    size=13,
+                    weight="bold",
+                ),
+                style=ButtonStyle(
+                    shape={
+                        "": RoundedRectangleBorder(radius=8),
+                    },
+                    color={
+                        "": "black",
+                    },
+                    bgcolor={"": "#7df6dd"},
+                ),
+                height=42,
+                width=320,
+            ),
+        )
+
+
+class UserInputField(UserControl):
+    def __init__(
+        self,
+        icon_name,
+        text_hint,
+        hide: bool,
+        function_emails: bool,
+        function_check: bool,
+    ):
+        self.icon_name = icon_name
+        self.text_hint = text_hint
+        self.hide = hide
+        self.function_emails = function_emails
+        self.function_check = function_check
+        super().__init__()
+
+    def return_email_prefix(self, e):
+        email = self.controls[0].content.controls[1].value
+        if e.control.data in email:
+            pass
         else:
-            page.snack_bar = ft.SnackBar(ft.Text("Непровильно написона данные"))
-            page.snack_bar.open = True
-            page.update()
+            self.controls[0].content.controls[1].value += e.control.data
+            self.controls[0].content.controls[2].offset = transform.Offset(0.5, 0)
+            self.controls[0].content.controls[2].opacity = 0
+            self.update()
 
-        db.commit()
-        db.close()
+    def prefix_email_containers(self):
+        email_labels = ["@gmail.com", "@hotmail.com"]
+        label_title = ["GMAIL", "MAIL"]
+        _row = Row(spacing=1, alignment=MainAxisAlignment.END)
+        for index, label in enumerate(email_labels):
+            _row.controls.append(
+                Container(
+                    width=45,
+                    height=30,
+                    alignment=alignment.center,
+                    content=Text(label_title[index], size=9, weight="bold"),
+                    data=label,
+                    on_click=lambda e: self.return_email_prefix(e),
+                )
+            )
+        return Row(
+            vertical_alignment=CrossAxisAlignment.CENTER,
+            alignment=MainAxisAlignment.END,
+            spacing=2,
+            opacity=0,
+            animate_opacity=200,
+            offset=transform.Offset(0.35, 0),
+            animate_offset=animation.Animation(400, "decelerate"),
+            controls=[_row],
+        )
 
-        user_login.value = ''
-        user_pass.value = ''
-        btn_auth.text = 'Added'
-        page.update()
+    def off_focus_input_check(self):
+        return Container(
+            opacity=0,
+            offset=transform.Offset(0, 0),
+            animate=200,
+            border_radius=6,
+            width=18,
+            height=18,
+            alignment=alignment.center,
+            content=Checkbox(
+                fill_color="#7df6dd",
+                check_color="black",
+                disabled=True,
+            ),
+        )
+    def get_green_check(self, e):
+        if self.function_check:
+            email = self.controls[0].content.controls[1].value
+            password = self.controls[0].content.controls[1].password
+            if email:
+                if "@gmail.com" in email or "@hotmail.com" in email or password:
+                    time.sleep(0.5)
+                    self.controls[0].content.controls[3].offset = transform.Offset(
+                        -2, 0
+                    )
+                    self.controls[0].content.controls[3].opacity = 1
+                    self.update()
+                    time.sleep(0.2)
+                    self.controls[0].content.controls[3].content.value = True
+                    time.sleep(0.1)
+                    self.update()
 
-    def validate(e):
-        if all([user_login.value, user_pass.value]):
-            btn_auth.disabled = False
+                else:
+                    self.controls[0].content.controls[3].offset = transform.Offset(0, 0)
+                    self.controls[0].content.controls[3].opacity = 0
+                    self.update()
         else:
-            btn_auth.disabled = True
+            pass
 
-        page.update()
+    def build(self):
+        return Container(
+            width=320,
+            height=40,
+            border=border.only(
+                bottom=border.BorderSide(0.5, "white54"),
+            ),
+            border_radius=6,
+            content=Row(
+                spacing=20,
+                vertical_alignment=CrossAxisAlignment.CENTER,
+                controls=[
+                    Icon(
+                        name=self.icon_name,
+                        size=14,
+                        opacity=0.85,
+                    ),
+                    TextField(
+                        border_color="transparent",
+                        bgcolor="transparent",
+                        height=20,
+                        width=200,
+                        text_size=12,
+                        content_padding=3,
+                        cursor_color="white",
+                        cursor_width=1,
+                        color="white",
+                        hint_text=self.text_hint,
+                        hint_style=TextStyle(
+                            size=11,
+                        ),
+                        password=self.hide,
+                        on_change=lambda e: self.get_prefix_emails(e),
+                        on_blur=lambda e: self.get_green_check(e),
+                    ),
+                    self.prefix_email_containers(),
+                    self.off_focus_input_check(),
+                ],
+            ),
+        )
 
-    user_login = ft.TextField(label='Login', width=270, on_change=validate)
-    user_pass = ft.TextField(label='Password', width=270, password=True, on_change=validate)
-    btn_auth = ft.OutlinedButton(text='Add', width=270, on_click=auth_user)
 
-    panel_registration = ft.Row(
-        [
-            ft.Column(
-                [
-                    ft.Text("Registration"),
-                    user_login,
-                    user_pass,
-                    btn_auth
-                ]
-            )
-        ],
-        alignment=ft.MainAxisAlignment.CENTER
+def main(page: Page):
+    page.horizontal_alignment = "center"
+    page.vertical_alignment = "center"
+    page.padding = padding.only(right=50)
+    page.bgcolor = "#212328"
+
+
+
+    page.add(
+        Card(
+            width=408,
+            height=612,
+            elevation=15,
+            content=Container(
+                bgcolor="#23262a",
+                border_radius=6,
+                content=Column(
+                    horizontal_alignment=CrossAxisAlignment.CENTER,
+                    controls=[
+                        Divider(height=40, color="transparent"),
+                        Stack(
+                            controls=[
+                                AnimatedBox("#e9665a", None, 0),
+                                AnimatedBox("#7df6dd", "#23262a", pi / 4),
+                            ]
+                        ),
+                        Divider(height=20, color="transparent"),
+                        Column(
+                            alignment=MainAxisAlignment.CENTER,
+                            horizontal_alignment=CrossAxisAlignment.CENTER,
+                            spacing=5,
+                            controls=[
+                                Text("Online Library", size=22, weight="bold"),
+                                Text(
+                                    "Sign In Online Library",
+                                    size=13,
+                                    weight="bold",
+                                ),
+                            ],
+                        ),
+                        Divider(height=30, color="transparent"),
+                        UserInputField(
+                            icons.PERSON_ROUNDED,
+                            "Email",
+                            False,
+                            True,
+                            True,
+                        ),
+                        Divider(height=1, color="transparent"),
+                        UserInputField(
+                            icons.LOCK_OUTLINE_ROUNDED,
+                            "Password",
+                            True,
+                            False,
+                            True,
+                        ),
+                        Divider(height=1, color="transparent"),
+                        Row(
+                            width=320,
+                            alignment=MainAxisAlignment.END,
+                            controls=[
+                                Container(
+                                    content=Text("Forgot Passowrd?", size=9),
+                                )
+                            ],
+                        ),
+                        Divider(height=45, color="transparent"),
+                        SignInButton("Sign In"),
+                        Divider(height=35, color="transparent"),
+                    ],
+                ),
+            ),
+        )
     )
+    page.update()
 
-    panel_logining = ft.Row(
-        [
-            ft.Column(
-                [
-                    ft.Text("Sing In"),
-                    user_login,
-                    user_pass,
-                    btn_auth
-                ]
-            )
-        ],
-        alignment=ft.MainAxisAlignment.CENTER
-    )
 
-    panel_cabinet = ft.Row(
-        [
-            ft.Column(
-                [
-                    ft.Text("Cabinet"),
-                ]
-            )
-        ],
-        alignment=ft.MainAxisAlignment.CENTER
-    )
-    def navigate(e):
-        index = page.navigation_bar.selected_index
-        page.clean()
-
-        if index == 0: page.add(panel_registration)
-        elif index == 1: page.add(panel_logining)
-        elif index == 2: page.add(panel_cabinet)
-
-    page.navigation_bar = ft.NavigationBar(
-        destinations=[
-            ft.NavigationDestination(icon=ft.icons.VERIFIED_USER, label="Registration"),
-            ft.NavigationDestination(icon=ft.icons.VERIFIED_USER_OUTLINED, label="Sing In")
-        ], on_change=navigate
-    )
-
-    page.add(panel_registration)
-
-ft.app(target=mains)
+if __name__ == "__main__":
+    flet.app(target=main)
