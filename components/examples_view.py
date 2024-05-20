@@ -1,5 +1,6 @@
 import flet as ft
 
+
 class ExamplesView(ft.Column):
     def __init__(self, gallery):
         super().__init__()

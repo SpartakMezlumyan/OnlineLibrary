@@ -1,7 +1,5 @@
 from typing import List
-
 from pony import orm
-
 from db.base import Author, Book
 
 
@@ -20,7 +18,6 @@ def add_book(title: str, description: str, author: Author) -> Book:
         description=description,
         author=author
     )
-
 
 @orm.db_session
 def fetch_books() -> List[Book]:

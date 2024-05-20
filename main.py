@@ -10,20 +10,15 @@ logging.basicConfig(level=logging.INFO)
 
 
 def main(page: ft.Page):
-
     page.title = "Online Library"
-
     page.fonts = {
         "Roboto Mono": "RobotoMono-VariableFont_wght.ttf",
     }
-
     def get_route_list(route):
         route_list = [item for item in route.split("/") if item != ""]
         return route_list
-
     def route_change(e):
         route_list = get_route_list(page.route)
-
         if len(route_list) == 0:
             page.go("/layout")
         else:
@@ -34,9 +29,7 @@ def main(page: ft.Page):
                 gallery_view.display_control_examples(route_list[1])
             else:
                 print("Invalid route")
-
     gallery_view = GalleryView(gallery)
-
     page.appbar = ft.AppBar(
         leading_width=40,
         title=ft.Text("School Library"),

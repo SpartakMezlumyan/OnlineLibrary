@@ -1,6 +1,5 @@
 import flet as ft
 
-
 class PopupColorItem(ft.PopupMenuItem):
     def __init__(self, color, name):
         super().__init__()

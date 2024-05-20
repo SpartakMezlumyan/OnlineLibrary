@@ -1,5 +1,4 @@
 import flet as ft
-
 from db.queries import fetch_books
 from getcode import generate_code
 
@@ -14,9 +13,6 @@ class ControlsGrid(ft.GridView):
         self.spacing = 10
         self.run_spacing = 10
         self.gallery = gallery
-
-    def grid_item_clicked(self, e):
-        pass
 
     def display(self):
         self.visible = True
@@ -91,4 +87,3 @@ class ControlsGrid(ft.GridView):
                     ),
                 )
             )
-
