@@ -59,7 +59,6 @@ class ControlsGrid(ft.GridView):
         for book in fetch_books():
             self.controls.append(
                 ft.Container(
-                    # on_click=self.grid_item_clicked,
                     bgcolor=ft.colors.SECONDARY_CONTAINER,
                     border_radius=5,
                     width=250,
@@ -74,7 +73,6 @@ class ControlsGrid(ft.GridView):
                                         tooltip="Information",
                                         icon_color=ft.colors.BLACK87,
                                         on_click=lambda e, b=book: show_banner_click(e, b),
-                                        # data=book,
                                     ),
                                     ft.Text(
                                         value=book.title,
